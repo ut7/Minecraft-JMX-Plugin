@@ -44,8 +44,7 @@ public class MineJMXPlayerListener implements Listener {
 		playerLoggedInTime = playerData.logOut();
 
 		// ...and the server statistics
-		plugin.serverData.decNumberOfPlayers() ;
-		plugin.serverData.incPlayTimeBy(playerLoggedInTime);
+		plugin.serverData.decNumberOfPlayers();
 	}
 
 	@EventHandler

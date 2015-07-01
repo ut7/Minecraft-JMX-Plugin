@@ -29,7 +29,6 @@ public class ServerData implements DynamicMBean {
 	private long itemsCrafted ;
 	private long npesKilled ;/** In progress */
 	private int playersKilled ; /** Done */
-	private long playTime ; /**< Done */
 	private int numberOfPlayers ; /**< Done */
 	private double playerDistanceMoved = 0.0; /**< In Progress */
 
@@ -79,20 +78,6 @@ public class ServerData implements DynamicMBean {
 
 	public void incNpesKilled() {
 		this.npesKilled++;
-	}
-	// }}}
-
-	// playTime {{{
-	public long getPlayTime() {
-		return playTime;
-	}
-
-	public void setPlayTime(long playTime) {
-		this.playTime = playTime;
-	}
-
-	public void incPlayTimeBy(long ms) {
-		this.playTime += ms;
 	}
 	// }}}
 
@@ -184,20 +169,6 @@ public class ServerData implements DynamicMBean {
 	}
 	// }}}
 
-	@SuppressWarnings("rawtypes")
-	public long getFullPlayTime() {
-		long activePlayTime = 0;
-
-		for(Iterator i = this.plugin.playerData.entrySet().iterator(); i.hasNext(); ) {
-			PlayerData player = (PlayerData)((Map.Entry)i.next()).getValue() ;
-			if(1 == player.getActive()) {
-				activePlayTime += player.timeSinceLogin();
-			}
-		}
-
-		return activePlayTime + this.playTime;
-	}
-
 	@Override
 	public Object getAttribute(String arg0) throws AttributeNotFoundException,
 			MBeanException, ReflectionException {
@@ -214,8 +185,6 @@ public class ServerData implements DynamicMBean {
 			return getItemsCrafted() ;
 		} else if(arg0.equals("playersKilled")) {
 			return getPlayersKilled() ;
-		} else if(arg0.equals("playTime")) {
-			return this.getFullPlayTime();
 		} else if(arg0.equals("npesKilled")) {
 			return this.getNpesKilled();
 		} else if(arg0.equals("numberOfPlayers")) {
@@ -246,7 +215,7 @@ public class ServerData implements DynamicMBean {
 	@Override
 	public MBeanInfo getMBeanInfo() {
 		OpenMBeanInfoSupport info;
-		OpenMBeanAttributeInfoSupport[] attributes = new OpenMBeanAttributeInfoSupport[10];
+		OpenMBeanAttributeInfoSupport[] attributes = new OpenMBeanAttributeInfoSupport[9];
 
 		//Build the Attributes
 		attributes[0] = new OpenMBeanAttributeInfoSupport("blocksPlaced","Number of Blocks Placed",SimpleType.LONG, true, false,false);
@@ -255,10 +224,9 @@ public class ServerData implements DynamicMBean {
 		attributes[3] = new OpenMBeanAttributeInfoSupport("blocksDecayed", "Number of blocks naturally decayed", SimpleType.LONG, true, false, false);
 		attributes[4] = new OpenMBeanAttributeInfoSupport("itemsCrafted","Number of items Crafted",SimpleType.LONG, true, false,false);
 		attributes[5] = new OpenMBeanAttributeInfoSupport("playersKilled","Number Of Players Killed",SimpleType.INTEGER, true, false,false);
-		attributes[6] = new OpenMBeanAttributeInfoSupport("playTime","Amount Of Time People have played on this Server",SimpleType.LONG, true, false,false);
-		attributes[7] = new OpenMBeanAttributeInfoSupport("npesKilled","Number of non-Player Entities killed",SimpleType.INTEGER, true, false, false);
-		attributes[8] = new OpenMBeanAttributeInfoSupport("numberOfPlayers","Number of Players On Server",SimpleType.INTEGER, true, false,false);
-		attributes[9] = new OpenMBeanAttributeInfoSupport("playerDistanceMoved", "Total player distance traveled", SimpleType.DOUBLE, true, false, false);
+		attributes[6] = new OpenMBeanAttributeInfoSupport("npesKilled","Number of non-Player Entities killed",SimpleType.INTEGER, true, false, false);
+		attributes[7] = new OpenMBeanAttributeInfoSupport("numberOfPlayers","Number of Players On Server",SimpleType.INTEGER, true, false,false);
+		attributes[8] = new OpenMBeanAttributeInfoSupport("playerDistanceMoved", "Total player distance traveled", SimpleType.DOUBLE, true, false, false);
 
 		//Build the info
 		info = new OpenMBeanInfoSupport(this.getClass().getName(),
@@ -287,8 +255,7 @@ public class ServerData implements DynamicMBean {
 
 	public String getMetricData() {
 		String rvalue = "" ;
-		return "playTime:"+this.playTime+
-				",blocksPlaced:"+this.blocksPlaced+
+		return "blocksPlaced:"+this.blocksPlaced+
 				",blocksDestroyed:"+this.blocksDestroyed+
 				",blocksSpread:"+this.blocksSpread+
 				",blocksDecayed:"+this.blocksDecayed+
@@ -307,9 +274,7 @@ public class ServerData implements DynamicMBean {
 		String[] datas = data.split(",") ;
 		for(String s : datas) {
 			String[] keyval = s.split(":") ;
-			if( keyval[0].equals("playTime") ) {
-				sd.setPlayTime(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksPlaced") ) {
+			if( keyval[0].equals("blocksPlaced") ) {
 				sd.setBlocksPlaced(Integer.decode(keyval[1])) ;
 			} else if( keyval[0].equals("blocksDestroyed") ) {
 				sd.setBlocksDestroyed(Integer.decode(keyval[1])) ;
