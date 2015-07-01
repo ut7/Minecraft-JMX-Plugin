@@ -1,6 +1,8 @@
 
 package com.dkhenry.minejmx;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.scheduler.BukkitScheduler;
 
 public class ServerTickPoller implements Runnable {
@@ -51,6 +53,14 @@ public class ServerTickPoller implements Runnable {
 		plugin.serverPerformanceData.setTickRate(tickRate) ; 
 		plugin.serverPerformanceData.addTicks(this.interval) ;
 		this.lastPoll = current ;  
+
+        plugin.serverData.setChunksLoaded(Bukkit.getServer().getWorld("World").getLoadedChunks().length);
+        plugin.serverData.setEntityCount(Bukkit.getServer().getWorld("World").getEntities().size());
+        long maxEPC = 0;
+        for(Chunk chunk: Bukkit.getServer().getWorld("World").getLoadedChunks()) {
+            if(maxEPC < chunk.getEntities().length) maxEPC = chunk.getEntities().length;
+        }
+        plugin.serverData.setEntitiesPerChunkMax(maxEPC);
 	}		
 	
 }

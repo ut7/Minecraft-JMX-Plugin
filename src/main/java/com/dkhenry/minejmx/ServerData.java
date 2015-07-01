@@ -31,6 +31,9 @@ public class ServerData implements DynamicMBean {
 	private int playersKilled ; /** Done */
 	private int numberOfPlayers ; /**< Done */
 	private double playerDistanceMoved = 0.0; /**< In Progress */
+    private long chunksLoaded;
+    private long entityCount;
+    private long entitiesPerChunkMax;
 
 	// need to access the plugin object from this one
 	private MineJMX plugin;
@@ -169,6 +172,36 @@ public class ServerData implements DynamicMBean {
 	}
 	// }}}
 
+    // chunksLoaded {{{
+    public long getChunksLoaded() {
+        return this.chunksLoaded;
+    }
+
+    public void setChunksLoaded(long chunksLoaded) {
+        this.chunksLoaded = chunksLoaded;
+    }
+    // }}}
+
+    // entityCount {{{
+    public long getEntityCount() {
+        return this.entityCount;
+    }
+
+    public void setEntityCount(long entityCount) {
+        this.entityCount = entityCount;
+    }
+    // }}}
+
+    // entitiesPerChunkMax {{{
+    public long getEntitiesPerChunkMax() {
+        return this.entitiesPerChunkMax;
+    }
+
+    public void setEntitiesPerChunkMax(long entitiesPerChunkMax) {
+        this.entitiesPerChunkMax = entitiesPerChunkMax;
+    }
+    // }}}
+
 	@Override
 	public Object getAttribute(String arg0) throws AttributeNotFoundException,
 			MBeanException, ReflectionException {
@@ -191,7 +224,13 @@ public class ServerData implements DynamicMBean {
 			return this.getNumberOfPlayers() ;
 		} else if(arg0.equals("playerDistanceMoved")) {
 			return this.getPlayerDistanceMoved();
-		}
+		} else if(arg0.equals("chunksLoaded")) {
+            return this.getChunksLoaded();
+        } else if(arg0.equals("entityCount")) {
+            return this.getEntityCount();
+        } else if(arg0.equals("entitiesPerChunkMax")) {
+            return this.getEntitiesPerChunkMax();
+        }
 		throw new AttributeNotFoundException("Cannot find " + arg0 + " attribute") ;
 	}
 
@@ -215,7 +254,7 @@ public class ServerData implements DynamicMBean {
 	@Override
 	public MBeanInfo getMBeanInfo() {
 		OpenMBeanInfoSupport info;
-		OpenMBeanAttributeInfoSupport[] attributes = new OpenMBeanAttributeInfoSupport[9];
+		OpenMBeanAttributeInfoSupport[] attributes = new OpenMBeanAttributeInfoSupport[12];
 
 		//Build the Attributes
 		attributes[0] = new OpenMBeanAttributeInfoSupport("blocksPlaced","Number of Blocks Placed",SimpleType.LONG, true, false,false);
@@ -227,6 +266,12 @@ public class ServerData implements DynamicMBean {
 		attributes[6] = new OpenMBeanAttributeInfoSupport("npesKilled","Number of non-Player Entities killed",SimpleType.INTEGER, true, false, false);
 		attributes[7] = new OpenMBeanAttributeInfoSupport("numberOfPlayers","Number of Players On Server",SimpleType.INTEGER, true, false,false);
 		attributes[8] = new OpenMBeanAttributeInfoSupport("playerDistanceMoved", "Total player distance traveled", SimpleType.DOUBLE, true, false, false);
+        attributes[9] = new OpenMBeanAttributeInfoSupport("chunksLoaded", "Total count of loaded chunks",
+        SimpleType.LONG, true, false, false);
+        attributes[10] = new OpenMBeanAttributeInfoSupport("entityCount", "Total count of active entities",
+        SimpleType.LONG, true, false, false);
+        attributes[11] = new OpenMBeanAttributeInfoSupport("entitiesPerChunkMax", "Max entity count among loaded chunks",
+        SimpleType.LONG, true, false, false);
 
 		//Build the info
 		info = new OpenMBeanInfoSupport(this.getClass().getName(),
@@ -262,7 +307,10 @@ public class ServerData implements DynamicMBean {
 				",itemsCrafted:"+this.itemsCrafted+
 				",playersKilled:"+this.playersKilled +
 				",npesKilled:" + this.npesKilled +
-				",playerDistanceMoved:" + this.playerDistanceMoved;
+				",playerDistanceMoved:" + this.playerDistanceMoved +
+                ",chunksLoaded:" + this.chunksLoaded +
+                ",entityCount:" + this.entityCount +
+                ",entitiesPerChunkMax:" + this.entitiesPerChunkMax;
 	}
 
 	public static ServerData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
@@ -275,22 +323,28 @@ public class ServerData implements DynamicMBean {
 		for(String s : datas) {
 			String[] keyval = s.split(":") ;
 			if( keyval[0].equals("blocksPlaced") ) {
-				sd.setBlocksPlaced(Integer.decode(keyval[1])) ;
+				sd.setBlocksPlaced(Long.decode(keyval[1])) ;
 			} else if( keyval[0].equals("blocksDestroyed") ) {
-				sd.setBlocksDestroyed(Integer.decode(keyval[1])) ;
+				sd.setBlocksDestroyed(Long.decode(keyval[1])) ;
 			} else if( keyval[0].equals("blocksSpread") ) {
-				sd.setBlocksSpread(Integer.decode(keyval[1])) ;
+				sd.setBlocksSpread(Long.decode(keyval[1])) ;
 			} else if( keyval[0].equals("blocksDecayed") ) {
-				sd.setBlocksDecayed(Integer.decode(keyval[1])) ;
+				sd.setBlocksDecayed(Long.decode(keyval[1])) ;
 			} else if( keyval[0].equals("itemsCrafted") ) {
-				sd.setItemsCrafted(Integer.decode(keyval[1])) ;
+				sd.setItemsCrafted(Long.decode(keyval[1])) ;
 			} else if( keyval[0].equals("playersKilled") ) {
 				sd.setPlayersKilled(Integer.decode(keyval[1])) ;
 			} else if(keyval[0].equals("npesKilled")) {
-				sd.setNpesKilled(Integer.decode(keyval[1]));
+				sd.setNpesKilled(Long.decode(keyval[1]));
 			} else if(keyval[0].equals("playerDistanceMoved")) {
 				sd.setPlayerDistanceMoved(Double.parseDouble(keyval[1]));
-			}
+            } else if(keyval[0].equals("chunksLoaded")) {
+                sd.setChunksLoaded(Long.decode(keyval[1]));
+			} else if(keyval[0].equals("entityCount")) {
+                sd.setEntityCount(Long.decode(keyval[1]));
+            } else if(keyval[0].equals("entitiesPerChunkMax")) {
+                sd.setEntityCount(Long.decode(keyval[1]));
+            }
 		}
 		return sd ;
 	}
