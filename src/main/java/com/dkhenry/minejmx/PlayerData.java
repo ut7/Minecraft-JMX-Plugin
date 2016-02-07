@@ -75,7 +75,7 @@ public class PlayerData implements DynamicMBean {
 		return timeOnServer;
 	}
 
-	public void setTimeOnServer(int timeOnServer) {
+	public void setTimeOnServer(long timeOnServer) {
 		this.timeOnServer = timeOnServer;
 	}
 
@@ -448,7 +448,7 @@ public class PlayerData implements DynamicMBean {
 		for(String s : datas) {
 			String[] keyval = s.split(":") ;
 			if( keyval[0].equals("timeOnServer") ) {
-				pd.setTimeOnServer(Integer.decode(keyval[1])) ;
+				pd.setTimeOnServer(Long.parseLong(keyval[1])) ;
 			} else if( keyval[0].equals("numberOfLogins") ) {
 				pd.setNumberOfLogins(Integer.decode(keyval[1])) ;
 			} else if( keyval[0].equals("blocksPlaced") ) {
