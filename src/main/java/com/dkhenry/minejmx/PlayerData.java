@@ -42,32 +42,32 @@ public class PlayerData implements DynamicMBean {
 
 	public PlayerData(MineJMX instance) {
 		this.plugin = instance;
-		this.mobsKilled = new HashMap<String,Integer>();
+		this.mobsKilled = new HashMap<>();
 		// real mobs
-		this.mobsKilled.put("creeper", new Integer(0));
-		this.mobsKilled.put("skeleton", new Integer(0));
-		this.mobsKilled.put("spider", new Integer(0));
-		this.mobsKilled.put("zombie", new Integer(0));
-		this.mobsKilled.put("slime", new Integer(0));
-		this.mobsKilled.put("enderman", new Integer(0));
-		this.mobsKilled.put("blaze", new Integer(0));
-		this.mobsKilled.put("pigman", new Integer(0));
-		this.mobsKilled.put("ghasts", new Integer(0));
-		this.mobsKilled.put("magma", new Integer(0));
+		this.mobsKilled.put("creeper", 0);
+		this.mobsKilled.put("skeleton", 0);
+		this.mobsKilled.put("spider", 0);
+		this.mobsKilled.put("zombie", 0);
+		this.mobsKilled.put("slime", 0);
+		this.mobsKilled.put("enderman", 0);
+		this.mobsKilled.put("blaze", 0);
+		this.mobsKilled.put("pigman", 0);
+		this.mobsKilled.put("ghasts", 0);
+		this.mobsKilled.put("magma", 0);
 		// animals
-		this.mobsKilled.put("chicken", new Integer(0));
-		this.mobsKilled.put("cow", new Integer(0));		
-		this.mobsKilled.put("pig", new Integer(0));
-		this.mobsKilled.put("dog", new Integer(0));
-		this.mobsKilled.put("sheep", new Integer(0));
-		this.mobsKilled.put("squid", new Integer(0));
-		this.mobsKilled.put("wolf", new Integer(0));
-		this.mobsKilled.put("ocolet", new Integer(0));
-		this.mobsKilled.put("mooshurm", new Integer(0));
+		this.mobsKilled.put("chicken", 0);
+		this.mobsKilled.put("cow", 0);		
+		this.mobsKilled.put("pig", 0);
+		this.mobsKilled.put("dog", 0);
+		this.mobsKilled.put("sheep", 0);
+		this.mobsKilled.put("squid", 0);
+		this.mobsKilled.put("wolf", 0);
+		this.mobsKilled.put("ocolet", 0);
+		this.mobsKilled.put("mooshurm", 0);
 		// NPC
-		this.mobsKilled.put("testificus", new Integer(0));
-		this.mobsKilled.put("irongolom", new Integer(0));
-		this.mobsKilled.put("snowgolom", new Integer(0));
+		this.mobsKilled.put("testificus", 0);
+		this.mobsKilled.put("irongolom", 0);
+		this.mobsKilled.put("snowgolom", 0);
 	}
 
 	// timeOnServer {{{
@@ -277,67 +277,68 @@ public class PlayerData implements DynamicMBean {
 	public Object getAttribute(String arg0) throws AttributeNotFoundException,
 			MBeanException, ReflectionException {
 
-		if(arg0.equals("timeOnServer")) {
-			return this.getFullTimeOnServer();
-		} else if(arg0.equals("numberOfLogins")) {
-			return getNumberOfLogins() ;
-		} else if(arg0.equals("blocksPlaced")) {
-			return getBlocksPlaced() ;
-		} else if(arg0.equals("blocksDestroyed")) {
-			return getBlocksDestroyed() ;
-		} else if(arg0.equals("itemsCrafted")) {
-			return getItemsCrafted() ;
-		} else if(arg0.equals("playersKilled")) {
-			return this.getPlayersKilled();
-		} else if(arg0.equals("mobsKilled")) {
-			return
-				this.mobsKilled.get("creeper") +
-				this.mobsKilled.get("skeleton") +
-				this.mobsKilled.get("spider") +
-				this.mobsKilled.get("zombie") +
-				this.mobsKilled.get("slime");
-		} else if(arg0.equals("creepersKilled")) {
-			return this.mobsKilled.get("creeper") ;
-		} else if(arg0.equals("skeletonsKilled")) {
-			return this.mobsKilled.get("skeleton") ;
-		} else if(arg0.equals("spidersKilled")) {
-			return this.mobsKilled.get("spider") ;
-		} else if(arg0.equals("zombiesKilled")) {
-			return this.mobsKilled.get("zombie") ;
-		} else if(arg0.equals("slimesKilled")) {
-			return this.mobsKilled.get("slime");
-		} else if(arg0.equals("animalsKilled")) {
-			return
-				this.mobsKilled.get("chicken") +
-				this.mobsKilled.get("cow") +
-				this.mobsKilled.get("pig") +
-				this.mobsKilled.get("sheep") +
-				this.mobsKilled.get("squid") +
-				this.mobsKilled.get("wolf");
-		} else if(arg0.equals("chickensKilled")) {
-			return this.mobsKilled.get("chicken");
-		} else if(arg0.equals("cowsKilled")) {
-			return this.mobsKilled.get("cow");
-		} else if(arg0.equals("pigsKilled")) {
-			return this.mobsKilled.get("pig");
-		} else if(arg0.equals("sheepsKilled")) {
-			return this.mobsKilled.get("sheep");
-		} else if(arg0.equals("squidsKilled")) {
-			return this.mobsKilled.get("squid");
-		} else if(arg0.equals("wolfsKilled")) {
-			return this.mobsKilled.get("wolf");
-		} else if(arg0.equals("deaths")) {
-			return getDeaths() ;
-		} else if(arg0.equals("active")) {
-			return getActive() ;
-		} else if(arg0.equals("distanceMoved")) {
-			return this.getDistanceMoved();
-		} else if(arg0.equals("deathsByPlayer")) {
-			return this.getDeathsByPlayer();
-		} else if(arg0.equals("deathsByEnvironment")) {
-			return this.getDeathsByEnvironment();
-		} else if(arg0.equals("deathsByNpe")) {
-			return this.getDeathsByNpe();
+		switch (arg0) {
+			case "timeOnServer":
+				return this.getFullTimeOnServer();
+			case "numberOfLogins":
+				return getNumberOfLogins();
+			case "blocksPlaced":
+				return getBlocksPlaced();
+			case "blocksDestroyed":
+				return getBlocksDestroyed();
+			case "itemsCrafted":
+				return getItemsCrafted();
+			case "playersKilled":
+				return this.getPlayersKilled();
+			case "mobsKilled":
+				return
+						this.mobsKilled.get("creeper") +
+								this.mobsKilled.get("skeleton") +
+								this.mobsKilled.get("spider") +
+								this.mobsKilled.get("zombie") +
+								this.mobsKilled.get("slime");
+			case "creepersKilled":
+				return this.mobsKilled.get("creeper");
+			case "skeletonsKilled":
+				return this.mobsKilled.get("skeleton");
+			case "spidersKilled":
+				return this.mobsKilled.get("spider");
+			case "zombiesKilled":
+				return this.mobsKilled.get("zombie");
+			case "slimesKilled":
+				return this.mobsKilled.get("slime");
+			case "animalsKilled":
+				return
+						this.mobsKilled.get("chicken") +
+								this.mobsKilled.get("cow") +
+								this.mobsKilled.get("pig") +
+								this.mobsKilled.get("sheep") +
+								this.mobsKilled.get("squid") +
+								this.mobsKilled.get("wolf");
+			case "chickensKilled":
+				return this.mobsKilled.get("chicken");
+			case "cowsKilled":
+				return this.mobsKilled.get("cow");
+			case "pigsKilled":
+				return this.mobsKilled.get("pig");
+			case "sheepsKilled":
+				return this.mobsKilled.get("sheep");
+			case "squidsKilled":
+				return this.mobsKilled.get("squid");
+			case "wolfsKilled":
+				return this.mobsKilled.get("wolf");
+			case "deaths":
+				return getDeaths();
+			case "active":
+				return getActive();
+			case "distanceMoved":
+				return this.getDistanceMoved();
+			case "deathsByPlayer":
+				return this.getDeathsByPlayer();
+			case "deathsByEnvironment":
+				return this.getDeathsByEnvironment();
+			case "deathsByNpe":
+				return this.getDeathsByNpe();
 		}
 
 		throw new AttributeNotFoundException("Cannot find " + arg0 + " attribute") ;
@@ -349,12 +350,12 @@ public class PlayerData implements DynamicMBean {
 		if(arg0.length == 0 ) {
 			return resultList ;
 		}
-		for ( int i = 0 ; i < arg0.length ; i++) {
+		for (String anArg0 : arg0) {
 			try {
-				Object Value = getAttribute(arg0[i]) ;
-				resultList.add(new Attribute(arg0[i],Value)) ;
+				Object Value = getAttribute(anArg0);
+				resultList.add(new Attribute(anArg0, Value));
 			} catch (Exception e) {
-				e.printStackTrace() ;
+				e.printStackTrace();
 			}
 		}
 		return resultList ;
@@ -439,7 +440,7 @@ public class PlayerData implements DynamicMBean {
 	}
 
 	public static PlayerData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
-		PlayerData pd = new PlayerData(plugin) ; ;
+		PlayerData pd = new PlayerData(plugin) ;
 		String data = rs.getString("data") ;
 		if(data.length() <=0 ) {
 			return pd ;
@@ -447,32 +448,46 @@ public class PlayerData implements DynamicMBean {
 		String[] datas = data.split(",") ;
 		for(String s : datas) {
 			String[] keyval = s.split(":") ;
-			if( keyval[0].equals("timeOnServer") ) {
-				pd.setTimeOnServer(Long.parseLong(keyval[1])) ;
-			} else if( keyval[0].equals("numberOfLogins") ) {
-				pd.setNumberOfLogins(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksPlaced") ) {
-				pd.setBlocksPlaced(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksDestroyed") ) {
-				pd.setBlocksDestroyed(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("itemsCrafted") ) {
-				pd.setItemsCrafted(Integer.decode(keyval[1])) ;
-			} else if(keyval[0].equals("playersKilled")) {
-				pd.setPlayersKilled(Integer.decode(keyval[1]));
-			} else if( keyval[0].equals("deaths") ) {
-				pd.setDeaths(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("active") ) {
-				// Don't Set Player Active
-			} else if(keyval[0].equals("distanceMoved")) {
-				pd.setDistanceMoved(Double.parseDouble(keyval[1]));
-			} else if(keyval[0].equals("deathsByPlayer")) {
-				pd.setDeathsByPlayer(Integer.decode(keyval[1]));
-			} else if(keyval[0].equals("deathsByEnvironment")) {
-				pd.setDeathsByEnvironment(Integer.decode(keyval[1]));
-			} else if(keyval[0].equals("deathsByNpe")) {
-				pd.setDeathsByNpe(Integer.decode(keyval[1]));
-			} else {
-				pd.getMobsKilled().put(keyval[0], Integer.decode(keyval[1])) ;
+			switch (keyval[0]) {
+				case "timeOnServer":
+					pd.setTimeOnServer(Long.parseLong(keyval[1]));
+					break;
+				case "numberOfLogins":
+					pd.setNumberOfLogins(Integer.decode(keyval[1]));
+					break;
+				case "blocksPlaced":
+					pd.setBlocksPlaced(Integer.decode(keyval[1]));
+					break;
+				case "blocksDestroyed":
+					pd.setBlocksDestroyed(Integer.decode(keyval[1]));
+					break;
+				case "itemsCrafted":
+					pd.setItemsCrafted(Integer.decode(keyval[1]));
+					break;
+				case "playersKilled":
+					pd.setPlayersKilled(Integer.decode(keyval[1]));
+					break;
+				case "deaths":
+					pd.setDeaths(Integer.decode(keyval[1]));
+					break;
+				case "active":
+					// Don't Set Player Active
+					break;
+				case "distanceMoved":
+					pd.setDistanceMoved(Double.parseDouble(keyval[1]));
+					break;
+				case "deathsByPlayer":
+					pd.setDeathsByPlayer(Integer.decode(keyval[1]));
+					break;
+				case "deathsByEnvironment":
+					pd.setDeathsByEnvironment(Integer.decode(keyval[1]));
+					break;
+				case "deathsByNpe":
+					pd.setDeathsByNpe(Integer.decode(keyval[1]));
+					break;
+				default:
+					pd.getMobsKilled().put(keyval[0], Integer.decode(keyval[1]));
+					break;
 			}
 		}
 		return pd ;

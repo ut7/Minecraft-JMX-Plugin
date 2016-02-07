@@ -85,14 +85,15 @@ public class BlockData implements DynamicMBean {
 	@Override
 	public Object getAttribute(String arg0) throws AttributeNotFoundException,
 			MBeanException, ReflectionException {
-		if(arg0.equals("blocksPlaced")) {
-			return getBlocksPlaced() ;
-		} else if(arg0.equals("blocksDestroyed")) {
-			return getBlocksDestroyed();
-		} else if(arg0.equals("blocksSpread")) {
-			return this.getBlocksSpread();
-		} else if(arg0.equals("blocksDecayed")) {
-			return this.getBlocksDecayed();
+		switch (arg0) {
+			case "blocksPlaced":
+				return getBlocksPlaced();
+			case "blocksDestroyed":
+				return getBlocksDestroyed();
+			case "blocksSpread":
+				return this.getBlocksSpread();
+			case "blocksDecayed":
+				return this.getBlocksDecayed();
 		}
 		throw new AttributeNotFoundException("Cannot find " + arg0 + " attribute") ;
 	}
@@ -103,12 +104,12 @@ public class BlockData implements DynamicMBean {
 		if(arg0.length == 0 ) {
 			return resultList ;
 		}
-		for ( int i = 0 ; i < arg0.length ; i++) {
+		for (String anArg0 : arg0) {
 			try {
-				Object Value = getAttribute(arg0[i]) ;
-				resultList.add(new Attribute(arg0[i],Value)) ;
+				Object Value = getAttribute(anArg0);
+				resultList.add(new Attribute(anArg0, Value));
 			} catch (Exception e) {
-				e.printStackTrace() ;
+				e.printStackTrace();
 			}
 		}
 		return resultList ;
@@ -157,7 +158,7 @@ public class BlockData implements DynamicMBean {
 	}
 
 	public static BlockData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
-		BlockData bd = new BlockData(plugin) ; ;
+		BlockData bd = new BlockData(plugin) ;
 		String data = rs.getString("data") ;
 		if(data.length() <=0 ) {
 			return bd ;
@@ -165,14 +166,19 @@ public class BlockData implements DynamicMBean {
 		String[] datas = data.split(",") ;
 		for(String s : datas) {
 			String[] keyval = s.split(":") ;
-			if( keyval[0].equals("blocksPlaced") ) {
-				bd.setBlocksPlaced(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksDestroyed") ) {
-				bd.setBlocksDestroyed(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksSpread") ) {
-				bd.setBlocksSpread(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksDecayed") ) {
-				bd.setBlocksDecayed(Integer.decode(keyval[1])) ;
+			switch (keyval[0]) {
+				case "blocksPlaced":
+					bd.setBlocksPlaced(Integer.decode(keyval[1]));
+					break;
+				case "blocksDestroyed":
+					bd.setBlocksDestroyed(Integer.decode(keyval[1]));
+					break;
+				case "blocksSpread":
+					bd.setBlocksSpread(Integer.decode(keyval[1]));
+					break;
+				case "blocksDecayed":
+					bd.setBlocksDecayed(Integer.decode(keyval[1]));
+					break;
 			}
 		}
 		return bd ;

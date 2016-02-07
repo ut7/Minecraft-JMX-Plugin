@@ -121,18 +121,19 @@ public class NpeData implements DynamicMBean {
 	// }}}
 
 	@Override public Object getAttribute(String arg0) throws AttributeNotFoundException, MBeanException, ReflectionException {
-		if(arg0.equals("totalDeaths")) {
-			return this.getTotalDeaths();
-		} else if(arg0.equals("deathsByPlayer")) {
-			return this.getDeathsByPlayer();
-		} else if(arg0.equals("deathsByEnvironment")) {
-			return this.getDeathsByEnvironment();
-		} else if(arg0.equals("deathsByNpe")) {
-			return this.getDeathsByNpe();
-		} else if(arg0.equals("playersKilled")) {
-			return this.getPlayersKilled();
-		} else if(arg0.equals("npesKilled")) {
-			return this.getNpesKilled();
+		switch (arg0) {
+			case "totalDeaths":
+				return this.getTotalDeaths();
+			case "deathsByPlayer":
+				return this.getDeathsByPlayer();
+			case "deathsByEnvironment":
+				return this.getDeathsByEnvironment();
+			case "deathsByNpe":
+				return this.getDeathsByNpe();
+			case "playersKilled":
+				return this.getPlayersKilled();
+			case "npesKilled":
+				return this.getNpesKilled();
 		}
 		throw new AttributeNotFoundException("Cannot find " + arg0 + " attribute");
 	}
@@ -142,11 +143,11 @@ public class NpeData implements DynamicMBean {
 		if(arg0.length == 0) {
 			return resultList;
 		}
-		for(int i = 0; i < arg0.length; i++) {
+		for (String anArg0 : arg0) {
 			try {
-				Object Value = getAttribute(arg0[i]);
-				resultList.add(new Attribute(arg0[i], Value));
-			} catch(Exception e) {
+				Object Value = getAttribute(anArg0);
+				resultList.add(new Attribute(anArg0, Value));
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -183,7 +184,6 @@ public class NpeData implements DynamicMBean {
 
 	// persistence {{{
 	public String getMetricData() {
-		String rvalue = "";
 		return "deathsByPlayer:" + this.deathsByPlayer +
 		       ",deathsByEnvironment:" + this.deathsByEnvironment +
 			   ",deathsByNpe:" + this.deathsByNpe +
@@ -199,14 +199,19 @@ public class NpeData implements DynamicMBean {
 		String[] datas = data.split(",");
 		for(String s : datas) {
 			String[] keyval = s.split(":");
-			if(keyval[0].equals("deathsByPlayer")) {
-				entry.setDeathsByPlayer(Integer.decode(keyval[1]));
-			} else if(keyval[0].equals("deathsByEnvironment")) {
-				entry.setDeathsByEnvironment(Integer.decode(keyval[1]));
-			} else if(keyval[0].equals("deathsByNpe")) {
-				entry.setDeathsByNpe(Integer.decode(keyval[1]));
-			} else if(keyval[0].equals("playersKilled")) {
-				entry.setPlayersKilled(Integer.decode(keyval[1]));
+			switch (keyval[0]) {
+				case "deathsByPlayer":
+					entry.setDeathsByPlayer(Integer.decode(keyval[1]));
+					break;
+				case "deathsByEnvironment":
+					entry.setDeathsByEnvironment(Integer.decode(keyval[1]));
+					break;
+				case "deathsByNpe":
+					entry.setDeathsByNpe(Integer.decode(keyval[1]));
+					break;
+				case "playersKilled":
+					entry.setPlayersKilled(Integer.decode(keyval[1]));
+					break;
 			}
 		}
 		return entry;

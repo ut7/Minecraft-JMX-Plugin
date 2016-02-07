@@ -21,7 +21,7 @@ public class MineJMXPlayerListener implements Listener {
 		Player player = event.getPlayer() ;
 
 		// Increment The Per Player Stats
-		PlayerData playerData = null ;
+		PlayerData playerData;
 		if(plugin.playerData.containsKey(player.getName())) {
 			playerData = plugin.playerData.get(player.getName()) ;
 		} else {

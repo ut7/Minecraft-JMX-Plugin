@@ -1,13 +1,6 @@
 
 package com.dkhenry.minejmx;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
@@ -19,6 +12,8 @@ import javax.management.ReflectionException;
 import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
 import javax.management.openmbean.OpenMBeanInfoSupport;
 import javax.management.openmbean.SimpleType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ServerData implements DynamicMBean {
 	// stuff we're exporting to JMX
@@ -206,31 +201,32 @@ public class ServerData implements DynamicMBean {
 	public Object getAttribute(String arg0) throws AttributeNotFoundException,
 			MBeanException, ReflectionException {
 
-		if(arg0.equals("blocksPlaced")) {
-			return getBlocksPlaced() ;
-		} else if(arg0.equals("blocksDestroyed")) {
-			return getBlocksDestroyed() ;
-		} else if(arg0.equals("blocksSpread")) {
-			return this.getBlocksSpread();
-		} else if(arg0.equals("blocksDecayed")) {
-			return this.getBlocksDecayed();
-		} else if(arg0.equals("itemsCrafted")) {
-			return getItemsCrafted() ;
-		} else if(arg0.equals("playersKilled")) {
-			return getPlayersKilled() ;
-		} else if(arg0.equals("npesKilled")) {
-			return this.getNpesKilled();
-		} else if(arg0.equals("numberOfPlayers")) {
-			return this.getNumberOfPlayers() ;
-		} else if(arg0.equals("playerDistanceMoved")) {
-			return this.getPlayerDistanceMoved();
-		} else if(arg0.equals("chunksLoaded")) {
-            return this.getChunksLoaded();
-        } else if(arg0.equals("entityCount")) {
-            return this.getEntityCount();
-        } else if(arg0.equals("entitiesPerChunkMax")) {
-            return this.getEntitiesPerChunkMax();
-        }
+		switch (arg0) {
+			case "blocksPlaced":
+				return getBlocksPlaced();
+			case "blocksDestroyed":
+				return getBlocksDestroyed();
+			case "blocksSpread":
+				return this.getBlocksSpread();
+			case "blocksDecayed":
+				return this.getBlocksDecayed();
+			case "itemsCrafted":
+				return getItemsCrafted();
+			case "playersKilled":
+				return getPlayersKilled();
+			case "npesKilled":
+				return this.getNpesKilled();
+			case "numberOfPlayers":
+				return this.getNumberOfPlayers();
+			case "playerDistanceMoved":
+				return this.getPlayerDistanceMoved();
+			case "chunksLoaded":
+				return this.getChunksLoaded();
+			case "entityCount":
+				return this.getEntityCount();
+			case "entitiesPerChunkMax":
+				return this.getEntitiesPerChunkMax();
+		}
 		throw new AttributeNotFoundException("Cannot find " + arg0 + " attribute") ;
 	}
 
@@ -240,12 +236,12 @@ public class ServerData implements DynamicMBean {
 		if(arg0.length == 0 ) {
 			return resultList ;
 		}
-		for ( int i = 0 ; i < arg0.length ; i++) {
+		for (String anArg0 : arg0) {
 			try {
-				Object Value = getAttribute(arg0[i]) ;
-				resultList.add(new Attribute(arg0[i],Value)) ;
+				Object Value = getAttribute(anArg0);
+				resultList.add(new Attribute(anArg0, Value));
 			} catch (Exception e) {
-				e.printStackTrace() ;
+				e.printStackTrace();
 			}
 		}
 		return resultList ;
@@ -299,7 +295,6 @@ public class ServerData implements DynamicMBean {
 	}
 
 	public String getMetricData() {
-		String rvalue = "" ;
 		return "blocksPlaced:"+this.blocksPlaced+
 				",blocksDestroyed:"+this.blocksDestroyed+
 				",blocksSpread:"+this.blocksSpread+
@@ -314,7 +309,7 @@ public class ServerData implements DynamicMBean {
 	}
 
 	public static ServerData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
-		ServerData sd = new ServerData(plugin) ; ;
+		ServerData sd = new ServerData(plugin) ;
 		String data = rs.getString("data") ;
 		if(data.length() <=0 ) {
 			return sd ;
@@ -322,29 +317,41 @@ public class ServerData implements DynamicMBean {
 		String[] datas = data.split(",") ;
 		for(String s : datas) {
 			String[] keyval = s.split(":") ;
-			if( keyval[0].equals("blocksPlaced") ) {
-				sd.setBlocksPlaced(Long.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksDestroyed") ) {
-				sd.setBlocksDestroyed(Long.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksSpread") ) {
-				sd.setBlocksSpread(Long.decode(keyval[1])) ;
-			} else if( keyval[0].equals("blocksDecayed") ) {
-				sd.setBlocksDecayed(Long.decode(keyval[1])) ;
-			} else if( keyval[0].equals("itemsCrafted") ) {
-				sd.setItemsCrafted(Long.decode(keyval[1])) ;
-			} else if( keyval[0].equals("playersKilled") ) {
-				sd.setPlayersKilled(Integer.decode(keyval[1])) ;
-			} else if(keyval[0].equals("npesKilled")) {
-				sd.setNpesKilled(Long.decode(keyval[1]));
-			} else if(keyval[0].equals("playerDistanceMoved")) {
-				sd.setPlayerDistanceMoved(Double.parseDouble(keyval[1]));
-            } else if(keyval[0].equals("chunksLoaded")) {
-                sd.setChunksLoaded(Long.decode(keyval[1]));
-			} else if(keyval[0].equals("entityCount")) {
-                sd.setEntityCount(Long.decode(keyval[1]));
-            } else if(keyval[0].equals("entitiesPerChunkMax")) {
-                sd.setEntityCount(Long.decode(keyval[1]));
-            }
+			switch (keyval[0]) {
+				case "blocksPlaced":
+					sd.setBlocksPlaced(Long.decode(keyval[1]));
+					break;
+				case "blocksDestroyed":
+					sd.setBlocksDestroyed(Long.decode(keyval[1]));
+					break;
+				case "blocksSpread":
+					sd.setBlocksSpread(Long.decode(keyval[1]));
+					break;
+				case "blocksDecayed":
+					sd.setBlocksDecayed(Long.decode(keyval[1]));
+					break;
+				case "itemsCrafted":
+					sd.setItemsCrafted(Long.decode(keyval[1]));
+					break;
+				case "playersKilled":
+					sd.setPlayersKilled(Integer.decode(keyval[1]));
+					break;
+				case "npesKilled":
+					sd.setNpesKilled(Long.decode(keyval[1]));
+					break;
+				case "playerDistanceMoved":
+					sd.setPlayerDistanceMoved(Double.parseDouble(keyval[1]));
+					break;
+				case "chunksLoaded":
+					sd.setChunksLoaded(Long.decode(keyval[1]));
+					break;
+				case "entityCount":
+					sd.setEntityCount(Long.decode(keyval[1]));
+					break;
+				case "entitiesPerChunkMax":
+					sd.setEntityCount(Long.decode(keyval[1]));
+					break;
+			}
 		}
 		return sd ;
 	}

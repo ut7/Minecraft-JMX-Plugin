@@ -1,11 +1,6 @@
 
 package com.dkhenry.minejmx;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
@@ -17,6 +12,8 @@ import javax.management.ReflectionException;
 import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
 import javax.management.openmbean.OpenMBeanInfoSupport;
 import javax.management.openmbean.SimpleType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 public class ServerPerformanceData implements DynamicMBean {
@@ -37,18 +34,19 @@ public class ServerPerformanceData implements DynamicMBean {
 	@Override
 	public Object getAttribute(String arg0) throws AttributeNotFoundException,
 			MBeanException, ReflectionException {
-		if(arg0.equals("serverTicks")) {
-			return getServerTicks() ;
-		} else if(arg0.equals("runningTasks")) {
-			return getRunningTasks() ;
-		} else if(arg0.equals("pendingTasks")) {
-			return getPendingTasks() ;
-		} else if(arg0.equals("ticksPerSecondAverage")) {
-			return getTicksPerSecondAverage() ;
-		} else if(arg0.equals("ticksPerSecondInstantious")) {
-			return getTicksPerSecondInstantious() ;
-		} else if(arg0.equals("serverLag")) {
-			return getServerLag() ;
+		switch (arg0) {
+			case "serverTicks":
+				return getServerTicks();
+			case "runningTasks":
+				return getRunningTasks();
+			case "pendingTasks":
+				return getPendingTasks();
+			case "ticksPerSecondAverage":
+				return getTicksPerSecondAverage();
+			case "ticksPerSecondInstantious":
+				return getTicksPerSecondInstantious();
+			case "serverLag":
+				return getServerLag();
 		} 
 		throw new AttributeNotFoundException("Cannot find " + arg0 + " attribute") ;
 	}
@@ -59,12 +57,12 @@ public class ServerPerformanceData implements DynamicMBean {
 		if(arg0.length == 0 ) {
 			return resultList ;
 		}
-		for ( int i = 0 ; i < arg0.length ; i++) {
+		for (String anArg0 : arg0) {
 			try {
-				Object Value = getAttribute(arg0[i]) ;
-				resultList.add(new Attribute(arg0[i],Value)) ;
+				Object Value = getAttribute(anArg0);
+				resultList.add(new Attribute(anArg0, Value));
 			} catch (Exception e) {
-				e.printStackTrace() ;
+				e.printStackTrace();
 			}
 		}
 		return resultList ;
@@ -182,19 +180,26 @@ public class ServerPerformanceData implements DynamicMBean {
 		String[] datas = data.split(",") ;		
 		for(String s : datas) {
 			String[] keyval = s.split(":") ;
-			if( keyval[0].equals("serverTicks") ) {
-				sd.setServerTicks(Long.decode(keyval[1])) ;
-			} else if( keyval[0].equals("runningTasks") ) {
-				sd.setRunningTasks(Long.decode(keyval[1])) ;
-			} else if( keyval[0].equals("pendingTasks") ) {
-				sd.setPendingTasks(Long.decode(keyval[1])) ;
-			} else if( keyval[0].equals("ticksPerSecondAverage") ) {
-				sd.setTicksPerSecondAverage(Integer.decode(keyval[1])) ;
-			} else if( keyval[0].equals("ticksPerSecondInstantious") ) {
-				sd.setTicksPerSecondInstantious(Integer.decode(keyval[1])) ;
-			}  else if( keyval[0].equals("serverLag") ) {
-				sd.setServerLag(Integer.decode(keyval[1])) ;
-			}  
+			switch (keyval[0]) {
+				case "serverTicks":
+					sd.setServerTicks(Long.decode(keyval[1]));
+					break;
+				case "runningTasks":
+					sd.setRunningTasks(Long.decode(keyval[1]));
+					break;
+				case "pendingTasks":
+					sd.setPendingTasks(Long.decode(keyval[1]));
+					break;
+				case "ticksPerSecondAverage":
+					sd.setTicksPerSecondAverage(Integer.decode(keyval[1]));
+					break;
+				case "ticksPerSecondInstantious":
+					sd.setTicksPerSecondInstantious(Integer.decode(keyval[1]));
+					break;
+				case "serverLag":
+					sd.setServerLag(Integer.decode(keyval[1]));
+					break;
+			}
 		}
 		return sd ;
 	}

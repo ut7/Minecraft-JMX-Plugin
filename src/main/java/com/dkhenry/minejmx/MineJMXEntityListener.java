@@ -8,7 +8,6 @@ import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause ; 
 
 public class MineJMXEntityListener implements Listener {
 	private MineJMX plugin ;
@@ -124,7 +123,7 @@ public class MineJMXEntityListener implements Listener {
 
 	@EventHandler 
 	public void onEntityDeath(EntityDeathEvent event) {
-		Entity subject = event.getEntity(), predicate;
+		Entity subject = event.getEntity(), zpredicate;
 
 		if(subject instanceof Player) {
 			this.handlePlayerDeath((Player)subject);

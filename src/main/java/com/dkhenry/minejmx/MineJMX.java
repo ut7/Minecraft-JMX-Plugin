@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.lang.Class;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
@@ -153,9 +151,7 @@ public class MineJMX extends JavaPlugin {
 			}
 			rs.close();
 			conn.close();
-		} catch (ClassNotFoundException e) {
-			 e.printStackTrace();
-		} catch (SQLException e) {
+		} catch (ClassNotFoundException | SQLException e) {
 			 e.printStackTrace();
 		}
 	}
@@ -189,9 +185,7 @@ public class MineJMX extends JavaPlugin {
 
 			rs.close();
 			conn.close();
-		} catch (ClassNotFoundException e) {
-			 e.printStackTrace();
-		} catch (SQLException e) {
+		} catch (ClassNotFoundException | SQLException e) {
 			 e.printStackTrace();
 		}
 	}
@@ -219,21 +213,25 @@ public class MineJMX extends JavaPlugin {
 		JMXServiceURL url;
 		
 		try {
-			String addr = "127.0.0.1" ;
-			if ( this.ip.equals("")) {
-				addr = Bukkit.getServer().getIp() ;
-				log.info("MineJMX: Using Minecraft Server IP of: " + addr) ;
-			} else if (this.ip.equals("*")) {
-				addr = InetAddress.getLocalHost().getHostAddress() ;
-				log.info("MineJMX: Using localhostname IP of: " + addr) ;
-			} else {
-				addr = this.ip ;
-				log.info("MineJMX: Using Configured IP of: " + addr) ;
+			String addr;
+			switch (this.ip) {
+				case "":
+					addr = Bukkit.getServer().getIp();
+					log.info("MineJMX: Using Minecraft Server IP of: " + addr);
+					break;
+				case "*":
+					addr = InetAddress.getLocalHost().getHostAddress();
+					log.info("MineJMX: Using localhostname IP of: " + addr);
+					break;
+				default:
+					addr = this.ip;
+					log.info("MineJMX: Using Configured IP of: " + addr);
+					break;
 			}
 						
 			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"
 			      + addr + ":" + this.port + "/jmxrmi");
-			Map<String, Object> env = new HashMap<String,Object>() ;
+			Map<String, Object> env = new HashMap<>() ;
 			env.put(JMXConnectorServer.AUTHENTICATOR, auth) ;				
 			log.info("Registering JMX Server On: " + url.toString()) ;
 			cs = JMXConnectorServerFactory.newJMXConnectorServer(url, env , mbs);
@@ -242,10 +240,6 @@ public class MineJMX extends JavaPlugin {
 			//starting JMXConnectorServer
 			cs.start();
 
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -268,81 +262,49 @@ public class MineJMX extends JavaPlugin {
 				mbs.unregisterMBean(oName) ;
 			}
 			mbs.registerMBean(player, oName) ;
-		} catch (InstanceAlreadyExistsException e) {
-			e.printStackTrace();
-		} catch (MBeanRegistrationException e) {
-			e.printStackTrace();
-		} catch (NotCompliantMBeanException e) {
-			e.printStackTrace();
-		} catch (MalformedObjectNameException e) {
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
+		} catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException | NotCompliantMBeanException | InstanceNotFoundException | NullPointerException e) {
 			e.printStackTrace();
 		}
 
-		this.playerData.put(name, player) ;
+        this.playerData.put(name, player) ;
 	}
 
 	public void addBlock(String mat, BlockData blockData) {
-		String name = mat ;
 		if( blockData == null ) {
 			blockData = new BlockData(this) ;
 		}
 		// Register the MBean
 		ObjectName oName ;
 		try {
-			oName = new ObjectName("org.dkhenry.minejmx:type=BlockData,name="+name);
+			oName = new ObjectName("org.dkhenry.minejmx:type=BlockData,name="+ mat);
 			if( mbs.isRegistered(oName) ) {
 				mbs.unregisterMBean(oName) ;
 			}
 			mbs.registerMBean(blockData, oName) ;
-		} catch (InstanceAlreadyExistsException e) {
-			//e.printStackTrace();
-		} catch (MBeanRegistrationException e) {
-			//e.printStackTrace();
-		} catch (NotCompliantMBeanException e) {
-			//e.printStackTrace();
-		} catch (MalformedObjectNameException e) {
-			//e.printStackTrace();
-		} catch (NullPointerException e) {
-			//e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
+		} catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException | NotCompliantMBeanException | InstanceNotFoundException | NullPointerException e) {
 			//e.printStackTrace();
 		}
 
-		this.blockData.put(name, blockData) ;
+        this.blockData.put(mat, blockData) ;
 	}
 
 	public void addNpe(String className, NpeData data) {
-		String name = className;
 		if(data == null) {
 			data = new NpeData(this);
 		}
 		// Register the MBean
 		ObjectName oName;
 		try {
-			oName = new ObjectName("org.dkhenry.minejmx:type=NpeData,name=" + name);
+			oName = new ObjectName("org.dkhenry.minejmx:type=NpeData,name=" + className);
 			if( mbs.isRegistered(oName) ) {
 				mbs.unregisterMBean(oName) ;
 			}
 			mbs.registerMBean(data, oName) ;
-		} catch (InstanceAlreadyExistsException e) {
-			//e.printStackTrace();
-		} catch (MBeanRegistrationException e) {
-			//e.printStackTrace();
-		} catch (NotCompliantMBeanException e) {
-			//e.printStackTrace();
-		} catch (MalformedObjectNameException e) {
-			//e.printStackTrace();
-		} catch (NullPointerException e) {
-			//e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
+		} catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException | NotCompliantMBeanException | InstanceNotFoundException | NullPointerException e) {
 			//e.printStackTrace();
 		}
 
-		this.npeData.put(name, data) ;
+        this.npeData.put(className, data) ;
 	}
 
 	public PlayerData getPlayerData(String name, String logIfNotFound) {
@@ -415,9 +377,9 @@ public class MineJMX extends JavaPlugin {
 
 		this.serverData = new ServerData(this);
 		this.serverPerformanceData = new ServerPerformanceData(this) ;
-		this.playerData = new HashMap<String,PlayerData>() ;
-		this.blockData = new HashMap<String,BlockData>() ;
-		this.npeData = new HashMap<String,NpeData>();
+		this.playerData = new HashMap<>() ;
+		this.blockData = new HashMap<>() ;
+		this.npeData = new HashMap<>();
 
 		loadState() ;
 
@@ -435,18 +397,8 @@ public class MineJMX extends JavaPlugin {
 				mbs.unregisterMBean(name) ;
 			}
 			mbs.registerMBean(serverPerformanceData, name) ;
-		} catch (MalformedObjectNameException e1) {
+		} catch (MalformedObjectNameException | NullPointerException | MBeanRegistrationException | InstanceAlreadyExistsException | InstanceNotFoundException | NotCompliantMBeanException e1) {
 			//e1.printStackTrace();
-		} catch (NullPointerException e1) {
-			//e1.printStackTrace();
-		} catch (InstanceAlreadyExistsException e) {
-			//e.printStackTrace();
-		} catch (MBeanRegistrationException e) {
-			//e.printStackTrace();
-		} catch (NotCompliantMBeanException e) {
-			//e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
-			//e.printStackTrace();
 		}
 
 		/* Register the Listeners */
