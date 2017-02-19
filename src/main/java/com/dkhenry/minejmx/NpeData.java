@@ -1,8 +1,5 @@
 package com.dkhenry.minejmx;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
@@ -182,39 +179,10 @@ public class NpeData implements DynamicMBean {
 		return new AttributeList();
 	}
 
-	// persistence {{{
 	public String getMetricData() {
 		return "deathsByPlayer:" + this.deathsByPlayer +
 		       ",deathsByEnvironment:" + this.deathsByEnvironment +
 			   ",deathsByNpe:" + this.deathsByNpe +
 			   ",playersKilled:" + this.playersKilled;
 	}
-
-	public static NpeData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
-		NpeData entry = new NpeData(plugin);
-		String data = rs.getString("data");
-		if(data.length() <= 0) {
-			return entry;
-		}
-		String[] datas = data.split(",");
-		for(String s : datas) {
-			String[] keyval = s.split(":");
-			switch (keyval[0]) {
-				case "deathsByPlayer":
-					entry.setDeathsByPlayer(Integer.decode(keyval[1]));
-					break;
-				case "deathsByEnvironment":
-					entry.setDeathsByEnvironment(Integer.decode(keyval[1]));
-					break;
-				case "deathsByNpe":
-					entry.setDeathsByNpe(Integer.decode(keyval[1]));
-					break;
-				case "playersKilled":
-					entry.setPlayersKilled(Integer.decode(keyval[1]));
-					break;
-			}
-		}
-		return entry;
-	}
-	// }}}
 }

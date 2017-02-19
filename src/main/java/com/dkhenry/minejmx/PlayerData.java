@@ -1,7 +1,5 @@
 package com.dkhenry.minejmx;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -418,7 +416,6 @@ public class PlayerData implements DynamicMBean {
 		return new AttributeList() ;
 	}
 
-	// persistence {{{
 	public String getMetricData() {
 		String rvalue = "" ;
 		for(Entry<String, Integer> entity : this.mobsKilled.entrySet()) {
@@ -438,59 +435,4 @@ public class PlayerData implements DynamicMBean {
 				",deathsByNpe:" + this.deathsByNpe +
 				rvalue;
 	}
-
-	public static PlayerData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
-		PlayerData pd = new PlayerData(plugin) ;
-		String data = rs.getString("data") ;
-		if(data.length() <=0 ) {
-			return pd ;
-		}
-		String[] datas = data.split(",") ;
-		for(String s : datas) {
-			String[] keyval = s.split(":") ;
-			switch (keyval[0]) {
-				case "timeOnServer":
-					pd.setTimeOnServer(Long.parseLong(keyval[1]));
-					break;
-				case "numberOfLogins":
-					pd.setNumberOfLogins(Integer.decode(keyval[1]));
-					break;
-				case "blocksPlaced":
-					pd.setBlocksPlaced(Integer.decode(keyval[1]));
-					break;
-				case "blocksDestroyed":
-					pd.setBlocksDestroyed(Integer.decode(keyval[1]));
-					break;
-				case "itemsCrafted":
-					pd.setItemsCrafted(Integer.decode(keyval[1]));
-					break;
-				case "playersKilled":
-					pd.setPlayersKilled(Integer.decode(keyval[1]));
-					break;
-				case "deaths":
-					pd.setDeaths(Integer.decode(keyval[1]));
-					break;
-				case "active":
-					// Don't Set Player Active
-					break;
-				case "distanceMoved":
-					pd.setDistanceMoved(Double.parseDouble(keyval[1]));
-					break;
-				case "deathsByPlayer":
-					pd.setDeathsByPlayer(Integer.decode(keyval[1]));
-					break;
-				case "deathsByEnvironment":
-					pd.setDeathsByEnvironment(Integer.decode(keyval[1]));
-					break;
-				case "deathsByNpe":
-					pd.setDeathsByNpe(Integer.decode(keyval[1]));
-					break;
-				default:
-					pd.getMobsKilled().put(keyval[0], Integer.decode(keyval[1]));
-					break;
-			}
-		}
-		return pd ;
-	}
-	// }}}
 }

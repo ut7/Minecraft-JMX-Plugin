@@ -1,8 +1,5 @@
 package com.dkhenry.minejmx;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
@@ -155,33 +152,6 @@ public class BlockData implements DynamicMBean {
 			   ",blocksDestroyed:"+this.blocksDestroyed+
 			   ",blocksSpread:"+this.blocksSpread+
 			   ",blocksDecayed:"+this.blocksDecayed  ;
-	}
-
-	public static BlockData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
-		BlockData bd = new BlockData(plugin) ;
-		String data = rs.getString("data") ;
-		if(data.length() <=0 ) {
-			return bd ;
-		}
-		String[] datas = data.split(",") ;
-		for(String s : datas) {
-			String[] keyval = s.split(":") ;
-			switch (keyval[0]) {
-				case "blocksPlaced":
-					bd.setBlocksPlaced(Integer.decode(keyval[1]));
-					break;
-				case "blocksDestroyed":
-					bd.setBlocksDestroyed(Integer.decode(keyval[1]));
-					break;
-				case "blocksSpread":
-					bd.setBlocksSpread(Integer.decode(keyval[1]));
-					break;
-				case "blocksDecayed":
-					bd.setBlocksDecayed(Integer.decode(keyval[1]));
-					break;
-			}
-		}
-		return bd ;
 	}
 }
 

@@ -12,9 +12,6 @@ import javax.management.ReflectionException;
 import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
 import javax.management.openmbean.OpenMBeanInfoSupport;
 import javax.management.openmbean.SimpleType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 
 public class ServerPerformanceData implements DynamicMBean {
 
@@ -169,38 +166,5 @@ public class ServerPerformanceData implements DynamicMBean {
 				",ticksPerSecondAverage:"+this.ticksPerSecondAverage+
 				",ticksPerSecondInstantious:"+this.ticksPerSecondInstantious+
 				",serverLag:"+this.serverLag ; 				
-	}
-
-	public static ServerPerformanceData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
-		ServerPerformanceData sd = new ServerPerformanceData(plugin) ; 
-		String data = rs.getString("data") ;
-		if(data.length() <=0 ) {
-			return sd ;
-		}
-		String[] datas = data.split(",") ;		
-		for(String s : datas) {
-			String[] keyval = s.split(":") ;
-			switch (keyval[0]) {
-				case "serverTicks":
-					sd.setServerTicks(Long.decode(keyval[1]));
-					break;
-				case "runningTasks":
-					sd.setRunningTasks(Long.decode(keyval[1]));
-					break;
-				case "pendingTasks":
-					sd.setPendingTasks(Long.decode(keyval[1]));
-					break;
-				case "ticksPerSecondAverage":
-					sd.setTicksPerSecondAverage(Integer.decode(keyval[1]));
-					break;
-				case "ticksPerSecondInstantious":
-					sd.setTicksPerSecondInstantious(Integer.decode(keyval[1]));
-					break;
-				case "serverLag":
-					sd.setServerLag(Integer.decode(keyval[1]));
-					break;
-			}
-		}
-		return sd ;
 	}
 }

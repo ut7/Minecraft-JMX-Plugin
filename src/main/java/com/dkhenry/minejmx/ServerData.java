@@ -12,8 +12,6 @@ import javax.management.ReflectionException;
 import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
 import javax.management.openmbean.OpenMBeanInfoSupport;
 import javax.management.openmbean.SimpleType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class ServerData implements DynamicMBean {
 	// stuff we're exporting to JMX
@@ -307,54 +305,5 @@ public class ServerData implements DynamicMBean {
                 ",entityCount:" + this.entityCount +
                 ",entitiesPerChunkMax:" + this.entitiesPerChunkMax;
 	}
-
-	public static ServerData instanceFromResultSet(ResultSet rs, MineJMX plugin) throws SQLException {
-		ServerData sd = new ServerData(plugin) ;
-		String data = rs.getString("data") ;
-		if(data.length() <=0 ) {
-			return sd ;
-		}
-		String[] datas = data.split(",") ;
-		for(String s : datas) {
-			String[] keyval = s.split(":") ;
-			switch (keyval[0]) {
-				case "blocksPlaced":
-					sd.setBlocksPlaced(Long.decode(keyval[1]));
-					break;
-				case "blocksDestroyed":
-					sd.setBlocksDestroyed(Long.decode(keyval[1]));
-					break;
-				case "blocksSpread":
-					sd.setBlocksSpread(Long.decode(keyval[1]));
-					break;
-				case "blocksDecayed":
-					sd.setBlocksDecayed(Long.decode(keyval[1]));
-					break;
-				case "itemsCrafted":
-					sd.setItemsCrafted(Long.decode(keyval[1]));
-					break;
-				case "playersKilled":
-					sd.setPlayersKilled(Integer.decode(keyval[1]));
-					break;
-				case "npesKilled":
-					sd.setNpesKilled(Long.decode(keyval[1]));
-					break;
-				case "playerDistanceMoved":
-					sd.setPlayerDistanceMoved(Double.parseDouble(keyval[1]));
-					break;
-				case "chunksLoaded":
-					sd.setChunksLoaded(Long.decode(keyval[1]));
-					break;
-				case "entityCount":
-					sd.setEntityCount(Long.decode(keyval[1]));
-					break;
-				case "entitiesPerChunkMax":
-					sd.setEntityCount(Long.decode(keyval[1]));
-					break;
-			}
-		}
-		return sd ;
-	}
-
 }
 

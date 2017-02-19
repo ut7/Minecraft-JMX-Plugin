@@ -32,8 +32,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.sql.* ;
-
 public class MineJMX extends JavaPlugin {
 
 	Logger log = Logger.getLogger("Minecraft") ;
@@ -64,9 +62,6 @@ public class MineJMX extends JavaPlugin {
 	private String hostname = null ; 
 	
 	private static String dir = "plugins";
-
-	private static String Persistance = dir + File.separator + "MineJMX.db" ;
-
 
 	/* Class to enable Password Based JMx Authentication */
 	private class JmxAuthenticatorImple implements JMXAuthenticator {
@@ -120,75 +115,6 @@ public class MineJMX extends JavaPlugin {
 
 	}
 
-	private void prepTables(Statement stat) throws SQLException {
-		stat.execute("CREATE TABLE IF NOT EXISTS metrics ( key , type , data , PRIMARY KEY(key,type) );") ;
-	}
-
-	private void loadState() {
-		try {
-			Class.forName("org.sqlite.JDBC");
-			Connection conn = DriverManager.getConnection("jdbc:sqlite:"+MineJMX.Persistance );
-			Statement stat = conn.createStatement();
-			prepTables(stat) ;
-			ResultSet rs = stat.executeQuery("SELECT key , type , data FROM metrics ;") ;
-
-			while (rs.next()) {
-				log.info("Restoring : " + rs.getString("key") + ":" + rs.getString("type") + ":" + rs.getString("data")) ;
-				if(rs.getString("type").equals("server")) {
-					this.serverData = ServerData.instanceFromResultSet(rs, this) ;
-				} else if(rs.getString("type").equals("player")) {
-					PlayerData pd = PlayerData.instanceFromResultSet(rs, this) ;
-					this.addPlayer(rs.getString("key"), pd) ;
-				} else if(rs.getString("type").equals("block")) {
-					BlockData bd = BlockData.instanceFromResultSet(rs, this) ;
-					this.addBlock(rs.getString("key"), bd) ;
-				} else if(rs.getString("type").equals("npe")) {
-					NpeData nd = NpeData.instanceFromResultSet(rs, this);
-					this.addNpe(rs.getString("key"), nd);
-				} else if(rs.getString("type").equals("performance")) {
-					this.serverPerformanceData = ServerPerformanceData.instanceFromResultSet(rs, this) ;
-				}
-			}
-			rs.close();
-			conn.close();
-		} catch (ClassNotFoundException | SQLException e) {
-			 e.printStackTrace();
-		}
-	}
-
-	private void saveState() {
-		try {
-			Class.forName("org.sqlite.JDBC");
-			Connection conn = DriverManager.getConnection("jdbc:sqlite:"+MineJMX.Persistance );
-			Statement stat = conn.createStatement();
-			prepTables(stat) ;
-			ResultSet rs = stat.executeQuery("SELECT key , type , data FROM metrics ;") ;
-			for(Entry<String, BlockData> entry : this.blockData.entrySet()) {
-				BlockData d = entry.getValue() ;
-				log.info("Saving: "+entry.getKey()+" : "+d.getMetricData()) ;
-				stat.executeUpdate("INSERT OR REPLACE INTO metrics VALUES ('"+entry.getKey()+"', 'block' , '"+d.getMetricData()+"') ;") ;
-			}
-			for(Entry<String, PlayerData> entry : this.playerData.entrySet()) {
-				PlayerData d = entry.getValue() ;
-				log.info("Saving: "+entry.getKey()+" : "+d.getMetricData()) ;
-				stat.executeUpdate("INSERT OR REPLACE INTO metrics VALUES ('"+entry.getKey()+"', 'player' , '"+d.getMetricData()+"') ;") ;
-			}
-			for(Entry<String, NpeData> entry : this.npeData.entrySet()) {
-				NpeData d = entry.getValue();
-				log.info("Saving: " + entry.getKey() + " : " + d.getMetricData());
-				stat.executeUpdate("INSERT OR REPLACE INTO metrics VALUES ('" + entry.getKey() + "', 'npe', '" + d.getMetricData() + "');");
-			}
-			log.info("Saving: this : server : "+this.serverData.getMetricData()) ;
-			stat.executeUpdate("INSERT OR REPLACE INTO metrics VALUES ('this' , 'server' , '"+this.serverData.getMetricData()+"') ;") ;
-
-			stat.executeUpdate("INSERT OR REPLACE INTO metrics VALUES ('this' , 'performance' , '"+this.serverPerformanceData.getMetricData()+"') ;") ;
-
-			rs.close();
-			conn.close();
-		} catch (ClassNotFoundException | SQLException e) {
-			 e.printStackTrace();
-		}
-	}
 	/**
 	 * @brief Since we don't want to make everyone modify their start script
 	 * To Enable JMX we will do it programaticly
@@ -356,7 +282,6 @@ public class MineJMX extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		saveState() ;
 		//stopping JMXConnectorServer
 		try {
 			cs.stop();
@@ -380,8 +305,6 @@ public class MineJMX extends JavaPlugin {
 		this.playerData = new HashMap<>() ;
 		this.blockData = new HashMap<>() ;
 		this.npeData = new HashMap<>();
-
-		loadState() ;
 
 		ObjectName name;
 		try {
