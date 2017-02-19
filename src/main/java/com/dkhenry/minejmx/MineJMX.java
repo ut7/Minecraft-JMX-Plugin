@@ -20,20 +20,12 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
-import javax.management.remote.JMXAuthenticator;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXPrincipal;
-import javax.management.remote.JMXServiceURL;
-import javax.security.auth.Subject;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.configuration.file.FileConfiguration;
 
 public class MineJMX extends JavaPlugin {
-
 	Logger log = Logger.getLogger("Minecraft") ;
 
 	/* The Listener Classes */
@@ -44,8 +36,6 @@ public class MineJMX extends JavaPlugin {
 
 	/* The JMx Specific Variables */
 	private MBeanServer mbs ;
-	private JMXConnectorServer cs ;
-	private Registry reg ;
 
 	/* The MBeans and their containers */
 	public ServerData serverData ;
@@ -54,66 +44,9 @@ public class MineJMX extends JavaPlugin {
 	public Map<String,BlockData> blockData ;
 	public Map<String,NpeData> npeData;
 
-	/* The Configure variables */
-	private String username = "admin";
-	private String passwd = "passwd";
-	private int port = 9999;
-	private String ip = "*";	
-	private String hostname = null ; 
-	
 	private static String dir = "plugins";
 
-	/* Class to enable Password Based JMx Authentication */
-	private class JmxAuthenticatorImple implements JMXAuthenticator {
-
-		@Override
-		public Subject authenticate(Object credentials) {
-			String[] info = (String[]) credentials ;
-			if( info[0].equals(username) && info[1].equals(passwd)) {
-				Subject s = new Subject() ;
-				s.getPrincipals().add(new JMXPrincipal(info[0])) ;
-				return s ;
-			} else {
-				throw new SecurityException() ;
-			}
-		}
-
-	}
-
-	private JmxAuthenticatorImple auth = new JmxAuthenticatorImple() ;	
-
 	private ServerTickPoller tickPoller;
-
-	/**
-	 * @brief This Function handles Loading the Configuration
-	 */
-	private void loadConfig() {
-		/* Read in the Properties File */
-                FileConfiguration cfg = this.getConfig();
-                cfg.addDefault("username", "admin");
-                cfg.addDefault("password", "passwd123");
-                cfg.addDefault("port", 9999);
-                cfg.addDefault("ip", "*");                
-                cfg.options().copyDefaults(true);
-                this.saveConfig();
-                            
-                this.username = cfg.getString("username");
-                if(cfg.get("password").getClass().equals(Integer.class)) {
-                    // All-numeric password needs to be converted to String.
-                    int ipass = cfg.getInt("password");
-                    this.passwd = Integer.toString(ipass);
-                }
-                else {
-                    this.passwd = cfg.getString("password");
-                }
-                this.port = cfg.getInt("port");
-                this.ip = cfg.getString("ip");
-                if( cfg.contains("hostname") ) { 
-                	this.hostname = cfg.getString("hostname") ;
-                }
-                
-
-	}
 
 	/**
 	 * @brief Since we don't want to make everyone modify their start script
@@ -122,53 +55,7 @@ public class MineJMX extends JavaPlugin {
 	private void enableJMX() {
 		/* Enable the JMX Portion of the System */
 		//acquiring platform MBeanServer
-
-		// Set the hostname if we need to 
-		if(null != this.hostname) {
-			log.info("MineJMX: Using Minecraft Server hostname of: " + this.hostname) ;
-			System.setProperty("java.rmi.server.hostname", this.hostname) ; 
-		}
-		
 		mbs = ManagementFactory.getPlatformMBeanServer();
-		if( null == mbs ) {
-			log.info("Platform MBean Server isnull creating a new mbs") ;
-			mbs = MBeanServerFactory.createMBeanServer();
-		}
-
-		//creating JMXConnectorServer instance
-		JMXServiceURL url;
-		
-		try {
-			String addr;
-			switch (this.ip) {
-				case "":
-					addr = Bukkit.getServer().getIp();
-					log.info("MineJMX: Using Minecraft Server IP of: " + addr);
-					break;
-				case "*":
-					addr = InetAddress.getLocalHost().getHostAddress();
-					log.info("MineJMX: Using localhostname IP of: " + addr);
-					break;
-				default:
-					addr = this.ip;
-					log.info("MineJMX: Using Configured IP of: " + addr);
-					break;
-			}
-						
-			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"
-			      + addr + ":" + this.port + "/jmxrmi");
-			Map<String, Object> env = new HashMap<>() ;
-			env.put(JMXConnectorServer.AUTHENTICATOR, auth) ;				
-			log.info("Registering JMX Server On: " + url.toString()) ;
-			cs = JMXConnectorServerFactory.newJMXConnectorServer(url, env , mbs);
-			reg = LocateRegistry.createRegistry(this.port);
-
-			//starting JMXConnectorServer
-			cs.start();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -192,7 +79,7 @@ public class MineJMX extends JavaPlugin {
 			e.printStackTrace();
 		}
 
-        this.playerData.put(name, player) ;
+		this.playerData.put(name, player) ;
 	}
 
 	public void addBlock(String mat, BlockData blockData) {
@@ -282,21 +169,11 @@ public class MineJMX extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		//stopping JMXConnectorServer
-		try {
-			cs.stop();
-			java.rmi.server.UnicastRemoteObject.unexportObject(reg,true);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		log.info("The MineJMX Plugin has been disabled.") ;
 	}
 
 	@Override
 	public void onEnable() {
-		/* Load our Configuration File */
-		loadConfig() ;
-
 		/* Do the Magic to Enable JMX  */
 		enableJMX() ;
 
